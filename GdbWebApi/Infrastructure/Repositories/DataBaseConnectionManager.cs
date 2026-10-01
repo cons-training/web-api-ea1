@@ -17,12 +17,12 @@ namespace GDB.App.Infrastructure.Repositories
 
         public static DbConnection GetConnection()
         {
-            var settings = ConfigurationManager.ConnectionStrings["GDBConnection"];
+            var settings = System.Configuration.ConfigurationManager.ConnectionStrings["GDBConnection"];
 
             if (settings == null)
             {
                 _logger.LogError("Connection string 'GDBConnection' is missing from App.config");
-                throw new ConfigurationErrorsException("Connection string 'GDBConnection' not found.");
+                throw new System.Configuration.ConfigurationErrorsException("Connection string 'GDBConnection' not found.");
             }
 
             string connectionString = settings.ConnectionString;

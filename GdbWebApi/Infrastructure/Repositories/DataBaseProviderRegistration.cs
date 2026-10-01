@@ -30,12 +30,12 @@ namespace GDB.App.Infrastructure.Repositories
         private static void RegisterProvider()
         {
             string providerName =
-            ConfigurationManager
+            System.Configuration.ConfigurationManager
                 .ConnectionStrings["GDBConnection"]
                 .ProviderName;
 
             string factoryTypeName =
-                ConfigurationManager.AppSettings["ProviderFactory"];
+                System.Configuration.ConfigurationManager.AppSettings["ProviderFactory"];
 
             Type factoryType =
                 Type.GetType(factoryTypeName);

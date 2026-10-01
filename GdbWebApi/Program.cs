@@ -1,3 +1,8 @@
+using GDB.App.Application.Services.Contracts;
+using GDB.App.Application.Services.Implementations;
+using GDB.App.Infrastructure.Repositories.Contracts;
+using GDB.App.Infrastructure.Repositories.Implementations;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -5,6 +10,11 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
+builder.Services.AddSwaggerGen();
+
+// Register application services and repositories
+builder.Services.AddScoped<IHomeService, HomeService>();
+builder.Services.AddScoped<IHomeRepository, HomeRepository>();
 
 var app = builder.Build();
 
@@ -12,6 +22,8 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
 
 app.UseHttpsRedirection();
