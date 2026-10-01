@@ -1,4 +1,4 @@
-﻿using GDB.App.Application.Dtos;
+using GDB.App.Application.Dtos;
 using GDB.App.Domain.Enums;
 using GDB.App.Domain.Models;
 using System;
@@ -24,7 +24,8 @@ namespace GDB.App.Application.Services.Contracts
 
         List<ViewAllAccountsResponseDto> GetAllAccounts();
         CreateAccountResponseDto CreateAccount(CreateAccountRequestDto request);
+        Task<CreateAccountResponseDto> CreateAccountAsync(CreateAccountRequestDto request);
 
-        Task<CloseAccountResponseDto> CloseAccountAsync( CloseAccountRequestDto request);
+        Task<CloseAccountResponseDto> CloseAccountAsync(CloseAccountRequestDto request);
     }
 }

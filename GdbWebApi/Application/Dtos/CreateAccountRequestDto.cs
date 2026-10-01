@@ -1,4 +1,4 @@
-﻿using GDB.App.Domain.Enums;
+using GDB.App.Domain.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,6 +23,6 @@ namespace GDB.App.Application.Dtos
         public int TenureMonths { get; set; }
         public double InterestRate { get; set; }
         public decimal MinimumBalance { get; set; }
-        public string EmployerName { get; set; }
+        public string? EmployerName { get; set; }
     }
 }

@@ -1,4 +1,4 @@
-﻿using GDB.App.Domain.Enums;
+using GDB.App.Domain.Enums;
 using GDB.App.Domain.Models;
 using GDB.App.Infrastructure.Repositories.Contracts;
 using GDB.App.Infrastructure.Repositories.Queries;
@@ -10,7 +10,7 @@ using System.Data;
 
 namespace GDB.App.Infrastructure.Repositories.Implementations
 {
-    internal class AccountRepositoryDB : IAccountRepository
+    public class AccountRepositoryDB : IAccountRepository
     {
         private static readonly ILogger _logger = AppLogger.CreateLogger<AccountRepositoryDB>();
 

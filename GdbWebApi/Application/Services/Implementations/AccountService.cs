@@ -1,4 +1,4 @@
-﻿using GDB.App.Application.Dtos;
+using GDB.App.Application.Dtos;
 using GDB.App.Application.Services.Contracts;
 using GDB.App.Domain;
 using GDB.App.Domain.Enums;
@@ -41,7 +41,7 @@ namespace GDB.App.Application.Services.Implementations
     /// This service uses dependency injection for the account repository and follows the repository pattern
     /// for data access operations. It also implements structured logging for audit trails and debugging.
     /// </remarks>
-    internal class AccountService : IAccountService
+    public class AccountService : IAccountService
     {
         /// <summary>
         /// Provides data access operations for account entities.
@@ -167,6 +167,11 @@ namespace GDB.App.Application.Services.Implementations
             // Retrieve account from repository
             var account = await _accountRepository.GetAccountAsync(accNo);
 
+            if (account == null)
+            {
+                return null;
+            }
+
             // Map to balance response DTO
             return new ViewBalanceResponseDto()
             {
@@ -197,6 +202,11 @@ namespace GDB.App.Application.Services.Implementations
         {
             // Retrieve account from repository
             var account = await _accountRepository.GetAccountAsync(accNo);
+
+            if (account == null)
+            {
+                return null;
+            }
 
             // Map to account view response DTO
             return new ViewAccountResponseDto()
@@ -323,10 +333,10 @@ namespace GDB.App.Application.Services.Implementations
         /// Console.WriteLine($"Account created: {response.AccountNumber}");
         /// </code>
         /// </example>
-        public CreateAccountResponseDto CreateAccount(CreateAccountRequestDto request)
+        public async Task<CreateAccountResponseDto> CreateAccountAsync(CreateAccountRequestDto request)
         {
-            // Check if the Account already Exists
-            var existing = _accountRepository.GetAccountAsync(request.AccountNumber).GetAwaiter().GetResult();
+            // Check if the Account already Exists asynchronously without blocking thread pool
+            var existing = await _accountRepository.GetAccountAsync(request.AccountNumber);
             if (existing != null)
             {
                 throw new InvalidOperationException($"Account {request.AccountNumber} already exists.");
@@ -393,6 +403,11 @@ namespace GDB.App.Application.Services.Implementations
                     ? salary.EmployerName
                     : null
             };
+        }
+
+        public CreateAccountResponseDto CreateAccount(CreateAccountRequestDto request)
+        {
+            return CreateAccountAsync(request).GetAwaiter().GetResult();
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿using GDB.App.Domain.Enums;
+using GDB.App.Domain.Enums;
 using GDB.App.Domain.Exceptions;
 
 using System;
@@ -15,7 +15,7 @@ using Microsoft.Extensions.Logging;
 
 namespace GDB.App.Infrastructure.Repositories
 {
-    class AccountRepositoryFactory
+    public class AccountRepositoryFactory
     {
         private static readonly ILogger _logger = AppLogger.CreateLogger<AccountRepositoryFactory>();
 
