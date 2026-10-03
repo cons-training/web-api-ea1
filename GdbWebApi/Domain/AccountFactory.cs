@@ -1,9 +1,9 @@
-﻿using GDB.App.Domain.Enums;
-using GDB.App.Domain.Models;
+﻿using GdbWebApi.Domain.Enums;
+using GdbWebApi.Domain.Models;
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
-namespace GDB.App.Domain;
+namespace GdbWebApi.Domain;
 public class AccountFactory
 {
     public static Account CreateAccount(AccountType accountType,

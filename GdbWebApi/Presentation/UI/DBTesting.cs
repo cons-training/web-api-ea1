@@ -1,7 +1,7 @@
 ﻿//using System;
 //using System.Data;
-//using GDB.App;
-//using GDB.App.Data;
+//using GdbWebApi;
+//using GdbWebApi.Data;
 
 //var ds = GDBInMemoryDB.CreateDataSet();
 

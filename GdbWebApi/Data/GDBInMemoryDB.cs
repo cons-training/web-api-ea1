@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Data;
 
-namespace GDB.App.Data
+namespace GdbWebApi.Data
 {
     /// <summary>
     /// Factory for creating the in-memory GDB DataSet.

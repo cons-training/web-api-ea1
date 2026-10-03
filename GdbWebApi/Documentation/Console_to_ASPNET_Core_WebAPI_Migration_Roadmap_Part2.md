@@ -128,14 +128,14 @@ graph TB
 | `Microsoft.AspNetCore.Authentication.JwtBearer` | 8.x | JWT authentication | R6 |
 | `System.IdentityModel.Tokens.Jwt` | Latest | Token generation | R6 |
 
-### Packages Added to GDB.App (for R8)
+### Packages Added to GdbWebApi (for R8)
 
 | Package | Version | Purpose | Release |
 |---|---|---|---|
 | `Microsoft.Extensions.Http` | 8.x | IHttpClientFactory | R8 |
 | `System.Net.Http.Json` | 8.x | JSON serialization for HttpClient | R8 |
 
-### Packages Removed from GDB.App
+### Packages Removed from GdbWebApi
 
 | Package | Reason | Release |
 |---|---|---|
@@ -854,5 +854,5 @@ erDiagram
 
 *Document Version: 1.0*  
 *Generated: 2026-10-01*  
-*Source Codebase: GDB.App (c:\GDB\gdb)*  
+*Source Codebase: GdbWebApi (c:\GDB\gdb)*  
 *Target: ASP.NET Core 8 Web API*
