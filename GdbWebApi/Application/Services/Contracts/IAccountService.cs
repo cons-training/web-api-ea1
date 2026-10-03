@@ -1,6 +1,6 @@
-﻿using GDB.App.Application.Dtos;
-using GDB.App.Domain.Enums;
-using GDB.App.Domain.Models;
+﻿using GdbWebApi.Application.Dtos;
+using GdbWebApi.Domain.Enums;
+using GdbWebApi.Domain.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 
-namespace GDB.App.Application.Services.Contracts
+namespace GdbWebApi.Application.Services.Contracts
 {
     public interface IAccountService
     {

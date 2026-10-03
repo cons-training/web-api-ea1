@@ -1,11 +1,11 @@
-﻿using GDB.App.Domain.Enums;
+﻿using GdbWebApi.Domain.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GDB.App.Infrastructure.Repositories.Implementations
+namespace GdbWebApi.Infrastructure.Repositories.Implementations
 {
     public class PrivilegeRepository
     {
