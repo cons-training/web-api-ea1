@@ -1,74 +1,85 @@
 ﻿using GDB.App.Application.Dtos;
 using GDB.App.Application.Services;
 using GDB.App.Application.Services.Contracts;
-using GDB.App.Application.Services.Implementations;
-using GDB.App.Domain.Enums;
 using GDB.App.Domain.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.NetworkInformation;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml.Linq;
+//using GdbWebApi.Application.Dtos;
+//using GdbWebApi.Application.Services;
+//using GdbWebApi.Application.Services.Contracts;
+using Microsoft.AspNetCore.Mvc;
 
-namespace GDB.App.Application.Controllers
+namespace GdbWebApi.Application.Controllers
 {
-    public class AccountController
+    [ApiController]
+    [Route("api/[controller]")]
+    public class AccountController : ControllerBase
     {
-        private IAccountService _accountService;
+        private readonly IAccountService _accountService;
+
         public AccountController()
         {
+            // Factory pattern retained intentionally for release 2
             _accountService = AccountServiceFactory.Create();
         }
 
-        //Boundary Class 
-        public async Task<IAccount> GetAccountAsync(string accNo)
+        // GET: api/Account/{accNo}
+        [HttpGet("{accNo}")]
+        public async Task<IActionResult> GetAccountAsync(string accNo)
         {
+            IAccount account = await _accountService.GetAccountAsync(accNo);
 
-            IAccount account = null;
-
-            //Controller->Service
-            account = await _accountService.GetAccountAsync(accNo);
-
-
-            return account;
-        }
-        public List<ViewAllAccountsResponseDto> GetAllAccounts()
-        {
-            return _accountService.GetAllAccounts();
+            return Ok(account);
         }
 
-        //public void ChangePin(string accountNumber, string oldPin, string newPin)
-        //{
-        //    _accountService.ChangePin(accountNumber, oldPin, newPin);
-        //}
+        // GET: api/Account
+        [HttpGet]
+        public IActionResult GetAllAccounts()
+        {
+            List<ViewAllAccountsResponseDto> accounts =
+                _accountService.GetAllAccounts();
 
-        public async Task<ViewBalanceResponseDto> GetBalanceAsync(string accNo)
-        {
-            return await _accountService.GetBalanceAsync(accNo);
-        }
-        public async Task<ViewAccountResponseDto> ViewAccountAsync(string accNo)
-        {
-            return await _accountService.ViewAccountAsync(accNo);
+            return Ok(accounts);
         }
 
-
-        public CreateAccountResponseDto CreateAccount(CreateAccountRequestDto request)
+        // GET: api/Account/{accNo}/balance
+        [HttpGet("{accNo}/balance")]
+        public async Task<IActionResult> GetBalanceAsync(string accNo)
         {
-            try
-            {
-                return _accountService.CreateAccount(request);
-            }
-            catch(InvalidOperationException ex)
-            {
-                throw ex;
-            }
+            ViewBalanceResponseDto response =
+                await _accountService.GetBalanceAsync(accNo);
+
+            return Ok(response);
         }
 
-        public async Task<CloseAccountResponseDto> CloseAccountAsync(CloseAccountRequestDto request)
+        // GET: api/Account/{accNo}/details
+        [HttpGet("{accNo}/details")]
+        public async Task<IActionResult> ViewAccountAsync(string accNo)
         {
-            return await _accountService.CloseAccountAsync(request);
+            ViewAccountResponseDto response =
+                await _accountService.ViewAccountAsync(accNo);
+
+            return Ok(response);
+        }
+
+        // POST: api/Account
+        [HttpPost]
+        public IActionResult CreateAccount(
+            [FromBody] CreateAccountRequestDto request)
+        {
+            CreateAccountResponseDto response =
+                _accountService.CreateAccount(request);
+
+            return Ok(response);
+        }
+
+        // PUT: api/Account/close
+        [HttpPut("close")]
+        public async Task<IActionResult> CloseAccountAsync(
+            [FromBody] CloseAccountRequestDto request)
+        {
+            CloseAccountResponseDto response =
+                await _accountService.CloseAccountAsync(request);
+
+            return Ok(response);
         }
     }
 }

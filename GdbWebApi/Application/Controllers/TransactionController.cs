@@ -1,83 +1,83 @@
-﻿using GDB.App.Application.Services.Contracts;
-using GDB.App.Domain.Enums;
+﻿using GDB.App.Application.Dtos;
 using GDB.App.Application.Services;
-using GDB.App.Application.Dtos;
+using GDB.App.Application.Services.Contracts;
+using GDB.App.Domain.Enums;
+//using GdbWebApi.Application.Dtos;
+//using GdbWebApi.Application.Services;
+//using GdbWebApi.Application.Services.Contracts;
+//using GdbWebApi.Domain.Enums;
+using Microsoft.AspNetCore.Mvc;
 
-namespace GDB.App.Application.Controllers
+namespace GDBWebAPI.Application.Controllers
 {
-    public class TransactionController
+    [ApiController]
+    [Route("api/[controller]")]
+    public class TransactionController : ControllerBase
     {
         private readonly ITransactionService _transactionService;
         private readonly ITransactionQueryService _transactionQueryService;
 
         public TransactionController()
         {
-            _transactionService =
-                TransactionServiceFactory.Create();
+            // Factory pattern intentionally retained for the release
+            _transactionService = TransactionServiceFactory.Create();
 
             _transactionQueryService =
                 TransactionQueryServiceFactory.Create();
         }
 
-        public async Task<DepositResponseDto> DepositAsync(
-            string accountNumber, decimal amount)
+        // POST: api/Transaction/deposit
+        [HttpPost("deposit")]
+        public async Task<ActionResult<DepositResponseDto>> DepositAsync(
+            [FromBody] TransactionDto transactionDto)
         {
-            TransactionDto transactionDto =
-                new TransactionDto
-                {
-                    AccountNumber = accountNumber,
-                    Amount = amount
-                };
+            DepositResponseDto response =
+                await _transactionService
+                    .ProcessTransactionAsync<DepositResponseDto>(
+                        transactionDto,
+                        TransactionType.Deposit);
 
-            return await _transactionService
-                .ProcessTransactionAsync<DepositResponseDto>(
-                    transactionDto,
-                    TransactionType.Deposit);
+            return Ok(response);
         }
 
-        public async Task<WithdrawResponseDto> WithdrawAsync(
-            string accountNumber, string pin, decimal amount)
+        // POST: api/Transaction/withdraw
+        [HttpPost("withdraw")]
+        public async Task<ActionResult<WithdrawResponseDto>> WithdrawAsync(
+            [FromBody] TransactionDto transactionDto)
         {
-            TransactionDto transactionDto =
-                new TransactionDto
-                {
-                    AccountNumber = accountNumber,
-                    Pin = pin,
-                    Amount = amount
-                };
+            WithdrawResponseDto response =
+                await _transactionService
+                    .ProcessTransactionAsync<WithdrawResponseDto>(
+                        transactionDto,
+                        TransactionType.Withdraw);
 
-            return await _transactionService
-                .ProcessTransactionAsync<WithdrawResponseDto>(
-                    transactionDto,
-                    TransactionType.Withdraw);
+            return Ok(response);
         }
 
-        public async Task<TranferFundsResponseDto> TransferFundsAsync(
-            string fromAccountNumber,
-            string toAccountNumber,
-            string pin,
-            decimal amount)
+        // POST: api/Transaction/transfer
+        [HttpPost("transfer")]
+        public async Task<ActionResult<TranferFundsResponseDto>> TransferFundsAsync(
+            [FromBody] TransactionDto transactionDto)
         {
-            TransactionDto transactionDto =
-                new TransactionDto
-                {
-                    FromAccount = fromAccountNumber,
-                    ToAccount = toAccountNumber,
-                    Pin = pin,
-                    Amount = amount
-                };
+            TranferFundsResponseDto response =
+                await _transactionService
+                    .ProcessTransactionAsync<TranferFundsResponseDto>(
+                        transactionDto,
+                        TransactionType.Transfer);
 
-            return await _transactionService
-                .ProcessTransactionAsync<TranferFundsResponseDto>(
-                    transactionDto,
-                    TransactionType.Transfer);
+            return Ok(response);
         }
 
-        public async Task<List<ViewRecentTransactionsResponseDto>>
+        // GET: api/Transaction/{accountNumber}/recent
+        [HttpGet("{accountNumber}/recent")]
+        public async Task<ActionResult<List<ViewRecentTransactionsResponseDto>>>
             GetRecentTransactionsAsync(string accountNumber)
         {
-            return await _transactionQueryService
-                .GetRecentTransactionsAsync(accountNumber);
+            List<ViewRecentTransactionsResponseDto> response =
+                await _transactionQueryService
+                    .GetRecentTransactionsAsync(accountNumber);
+
+            return Ok(response);
         }
     }
 }
