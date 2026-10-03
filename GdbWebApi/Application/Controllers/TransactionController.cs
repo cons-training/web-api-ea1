@@ -1,14 +1,14 @@
-﻿using GDB.App.Application.Dtos;
-using GDB.App.Application.Services;
-using GDB.App.Application.Services.Contracts;
-using GDB.App.Domain.Enums;
+﻿using GdbWebApi.Application.Dtos;
+using GdbWebApi.Application.Services;
+using GdbWebApi.Application.Services.Contracts;
+using GdbWebApi.Domain.Enums;
 //using GdbWebApi.Application.Dtos;
 //using GdbWebApi.Application.Services;
 //using GdbWebApi.Application.Services.Contracts;
 //using GdbWebApi.Domain.Enums;
 using Microsoft.AspNetCore.Mvc;
 
-namespace GDBWebAPI.Application.Controllers
+namespace GdbWebApi.Application.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]

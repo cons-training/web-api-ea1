@@ -169,7 +169,7 @@ Create the ASP.NET Core solution and API foundation while keeping the existing c
 - [ ] Create `GDB.sln` and add the existing application project.
 - [ ] Create `GDB.Api` targeting `net8.0`.
 - [ ] Add the API-to-application project reference.
-- [ ] Convert `GDB.App` from executable output to a reusable library without breaking its current build path.
+- [ ] Convert `GdbWebApi` from executable output to a reusable library without breaking its current build path.
 - [ ] Move application startup responsibility to `GDB.Api/Program.cs`.
 - [ ] Add Swashbuckle and Serilog packages compatible with .NET 8.
 - [ ] Remove the duplicate `System.Data.SqlClient` dependency where safe; retain `Microsoft.Data.SqlClient`.

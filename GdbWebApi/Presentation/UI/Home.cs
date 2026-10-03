@@ -1,10 +1,10 @@
-﻿using GDB.App.Application.Controllers;
-using GDB.App.Application.Dtos;
-using GDB.App.Application.Services.Contracts;
-using GDB.App.Application.Services.Implementations;
-using GDB.App.Domain.Enums;
-using GDB.App.Domain.Exceptions;
-using GDB.App.Domain.Models;
+﻿using GdbWebApi.Application.Controllers;
+using GdbWebApi.Application.Dtos;
+using GdbWebApi.Application.Services.Contracts;
+using GdbWebApi.Application.Services.Implementations;
+using GdbWebApi.Domain.Enums;
+using GdbWebApi.Domain.Exceptions;
+using GdbWebApi.Domain.Models;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -14,8 +14,9 @@ using System.Security.Principal;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
 
-namespace GDB.App.Presentation.UI
+namespace GdbWebApi.Presentation.UI
 {
     public class Home
     {
@@ -23,35 +24,42 @@ namespace GDB.App.Presentation.UI
 
         private static string FormatRupee(decimal? amount) =>
             amount.HasValue
-                ? amount.Value.ToString("C", new CultureInfo("en-IN")): "N/A";
+                ? amount.Value.ToString("C", new CultureInfo("en-IN"))
+                : "N/A";
 
         private static bool IsValidAccountNumberInput(string acc)
         {
-            if (string.IsNullOrWhiteSpace(acc)) return false;
+            if (string.IsNullOrWhiteSpace(acc))
+                return false;
+
             acc = acc.Trim();
 
-            // Example rule: exactly 10 digits. Change to suit your business rule.
+            // Exactly 10 digits
             return Regex.IsMatch(acc, @"^\d{10}$");
         }
 
         private static bool IsValidPinInput(string pin)
         {
-            if (string.IsNullOrWhiteSpace(pin)) return false;
+            if (string.IsNullOrWhiteSpace(pin))
+                return false;
+
             pin = pin.Trim();
 
-            // Rule: exactly 4 digits
+            // Exactly 4 digits
             return Regex.IsMatch(pin, @"^\d{4}$");
         }
 
         public async Task Start()
         {
-             choice = -1;
+            choice = -1;
 
             while (choice != 0)
             {
                 Console.WriteLine();
                 Console.WriteLine("Welcome to GDB");
-                Console.WriteLine("1. Create Account\n" +
+
+                Console.WriteLine(
+                    "1. Create Account\n" +
                     "2. View Account\n" +
                     "3. View All Accounts\n" +
                     "4. View Balance\n" +
@@ -112,10 +120,12 @@ namespace GDB.App.Presentation.UI
                         break;
                 }
             }
-        
-
-
         }
+
+        // ============================================================
+        // CREATE ACCOUNT
+        // ============================================================
+
         public void CreateAccount()
         {
             AccountController controller = new AccountController();
@@ -125,10 +135,11 @@ namespace GDB.App.Presentation.UI
             Console.Write("Enter Account Number: ");
             var accountNumber = Console.ReadLine().Trim();
 
-            // Check if the user has entered valid Account Number or not
             while (!IsValidAccountNumberInput(accountNumber))
             {
-                Console.WriteLine("Invalid account number. Please enter a 10-digit numeric account number.");
+                Console.WriteLine(
+                    "Invalid account number. Please enter a 10-digit numeric account number.");
+
                 Console.Write("Enter Account Number: ");
                 accountNumber = Console.ReadLine()!;
             }
@@ -145,15 +156,14 @@ namespace GDB.App.Presentation.UI
             Console.Write("Enter PIN: ");
             var pin = Console.ReadLine()!.Trim();
 
-            // Check if the user has entered valid PIN or not
             while (!IsValidPinInput(pin))
             {
-                Console.WriteLine("Invalid PIN. Please enter a 4-digit numeric PIN.");
+                Console.WriteLine(
+                    "Invalid PIN. Please enter a 4-digit numeric PIN.");
+
                 Console.Write("Enter PIN: ");
                 pin = Console.ReadLine()!.Trim();
             }
-
-            
 
             Console.WriteLine("Select Account Type:");
             Console.WriteLine("1. Savings");
@@ -253,104 +263,237 @@ namespace GDB.App.Presentation.UI
                 EmployerName = employerName
             };
 
-            
-
             try
             {
-                // ============================================================
+                // ========================================================
                 // SEND REQUEST DTO TO CONTROLLER
-                // AND RECEIVE RESPONSE DTO
-                // ============================================================
+                // CONTROLLER RETURNS IActionResult
+                // ========================================================
 
+                IActionResult result =
+                    controller.CreateAccount(request);
 
-                CreateAccountResponseDto response =
-                controller.CreateAccount(request);
+                // ========================================================
+                // EXTRACT DTO FROM IActionResult
+                // ========================================================
 
-                // ============================================================
-                // DISPLAY RESPONSE DTO
-                // ============================================================
+                if (result is OkObjectResult okResult &&
+                    okResult.Value is CreateAccountResponseDto response)
+                {
+                    Console.WriteLine();
+                    Console.WriteLine(
+                        "===== ACCOUNT CREATED SUCCESSFULLY =====");
 
-                Console.WriteLine();
-                Console.WriteLine("===== ACCOUNT CREATED SUCCESSFULLY =====");
+                    Console.WriteLine(
+                        $"Account Number : {response.AccountNumber}");
 
-                Console.WriteLine($"Account Number : {response.AccountNumber}");
-                Console.WriteLine($"Name           : {response.Name}");
-                Console.WriteLine($"Account Type   : {response.AccountType}");
-                Console.WriteLine($"Balance        : {FormatRupee(response.Balance)}");
-                Console.WriteLine($"Status         : {response.Status}");
-                Console.WriteLine($"Privilege      : {response.Privilege}");
+                    Console.WriteLine(
+                        $"Name           : {response.Name}");
+
+                    Console.WriteLine(
+                        $"Account Type   : {response.AccountType}");
+
+                    Console.WriteLine(
+                        $"Balance        : {FormatRupee(response.Balance)}");
+
+                    Console.WriteLine(
+                        $"Status         : {response.Status}");
+
+                    Console.WriteLine(
+                        $"Privilege      : {response.Privilege}");
+                }
+                else
+                {
+                    Console.WriteLine();
+                    Console.WriteLine("Account creation failed.");
+
+                    if (result is ObjectResult errorResult)
+                    {
+                        Console.WriteLine(
+                            $"Error: {errorResult.Value}");
+                    }
+                }
             }
             catch (InvalidOperationException ex)
             {
                 Console.WriteLine("\n" + ex.Message);
             }
-            
+            catch (Exception ex)
+            {
+                Console.WriteLine("\nError: " + ex.Message);
+            }
         }
 
+        // ============================================================
+        // VIEW ACCOUNT
+        // ============================================================
 
         public async Task ViewAccountAsync()
         {
-            //Accept accNo to get the accountInfo
             Console.WriteLine("Enter the account number.");
             string accNo = Console.ReadLine();
 
-            //Contact the database to get the accountInfo
-            //UI->controller
-            ViewAccountResponseDto account = await new AccountController().ViewAccountAsync(accNo);
-            //Display the accountInfo
-            
-            if (account == null)
+            if (!IsValidAccountNumberInput(accNo))
             {
-                Console.WriteLine("Account not found.");
+                Console.WriteLine("Invalid account number.");
                 return;
             }
 
-            Console.WriteLine();
-            Console.WriteLine("Account Number : " + account.AccountNumber);
-            Console.WriteLine("Name           : " + account.Name);
-            Console.WriteLine($"Balance       : {FormatRupee(account.Balance)}");
-        }
-        public void ViewAllAccounts()
-        {
-            AccountController controller = new AccountController();
-
-            var accounts = controller.GetAllAccounts();
-
-            Console.WriteLine();
-            Console.WriteLine("All Accounts");
-            Console.WriteLine("----------------------------");
-
-            foreach (var account in accounts)
+            try
             {
-                Console.WriteLine("Account Type   : " + account.AccountType);
-                Console.WriteLine("Account Number : " + account.AccountNumber);
-                Console.WriteLine("Name           : " + account.Name);
-                Console.WriteLine("Age            : " + account.Age);
-                Console.WriteLine($"Balance       : {FormatRupee(account.Balance)}");
-                Console.WriteLine("Status         : " + account.AccountStatus);
-                Console.WriteLine("Privilege      : " + account.AccountPrivilege);
+                AccountController controller =
+                    new AccountController();
+
+                // Controller returns IActionResult
+                IActionResult result =
+                    await controller.ViewAccountAsync(accNo);
+
+                if (result is OkObjectResult okResult &&
+                    okResult.Value is ViewAccountResponseDto account)
+                {
+                    Console.WriteLine();
+                    Console.WriteLine(
+                        "Account Number : " + account.AccountNumber);
+
+                    Console.WriteLine(
+                        "Name           : " + account.Name);
+
+                    Console.WriteLine(
+                        $"Balance        : {FormatRupee(account.Balance)}");
+                }
+                else
+                {
+                    Console.WriteLine("Account not found.");
+
+                    if (result is ObjectResult errorResult &&
+                        errorResult.Value != null)
+                    {
+                        Console.WriteLine(
+                            $"Error: {errorResult.Value}");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("\nError: " + ex.Message);
             }
         }
+
+        // ============================================================
+        // VIEW ALL ACCOUNTS
+        // ============================================================
+
+        // ============================================================
+        // VIEW ALL ACCOUNTS
+        // ============================================================
+
+        public void ViewAllAccounts()
+        {
+            AccountController controller =
+                new AccountController();
+
+            try
+            {
+                IActionResult result =
+                    controller.GetAllAccounts();
+
+                if (result is OkObjectResult okResult &&
+                    okResult.Value is IEnumerable<ViewAccountResponseDto> accounts)
+                {
+                    Console.WriteLine();
+                    Console.WriteLine("===== ALL ACCOUNTS =====");
+                    Console.WriteLine("----------------------------");
+
+                    foreach (ViewAccountResponseDto account in accounts)
+                    {
+                        Console.WriteLine(
+                            "Account Number : " +
+                            account.AccountNumber);
+
+                        Console.WriteLine(
+                            "Name           : " +
+                            account.Name);
+
+                        Console.WriteLine(
+                            $"Balance        : " +
+                            $"{FormatRupee(account.Balance)}");
+
+                        Console.WriteLine(
+                            "----------------------------");
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("No accounts found.");
+
+                    if (result is ObjectResult errorResult &&
+                        errorResult.Value != null)
+                    {
+                        Console.WriteLine(
+                            $"Error: {errorResult.Value}");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(
+                    "\nError: " + ex.Message);
+            }
+        }
+
+        // ============================================================
+        // VIEW BALANCE
+        // ============================================================
+
         public async Task ViewBalanceAsync()
         {
             Console.WriteLine("Enter Account Number:");
             string accountNumber = Console.ReadLine();
 
-            AccountController controller = new AccountController();
-
-            ViewBalanceResponseDto account = await controller.GetBalanceAsync(accountNumber);
-
-            if (account == null)
+            if (!IsValidAccountNumberInput(accountNumber))
             {
-                Console.WriteLine("Account not found.");
+                Console.WriteLine("Invalid account number.");
                 return;
             }
 
-            Console.WriteLine();
-            Console.WriteLine($"Balance  : {FormatRupee(account.Balance)}");
-            
+            AccountController controller =
+                new AccountController();
 
+            try
+            {
+                // Controller returns IActionResult
+                IActionResult result =
+                    await controller.GetBalanceAsync(accountNumber);
+
+                if (result is OkObjectResult okResult &&
+                    okResult.Value is ViewBalanceResponseDto account)
+                {
+                    Console.WriteLine();
+                    Console.WriteLine(
+                        $"Balance : {FormatRupee(account.Balance)}");
+                }
+                else
+                {
+                    Console.WriteLine("Account not found.");
+
+                    if (result is ObjectResult errorResult &&
+                        errorResult.Value != null)
+                    {
+                        Console.WriteLine(
+                            $"Error: {errorResult.Value}");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("\nError: " + ex.Message);
+            }
         }
+
+        // ============================================================
+        // VIEW RECENT TRANSACTIONS
+        // ============================================================
+
         public async Task ViewRecentTransactionsAsync()
         {
             Console.WriteLine();
@@ -359,13 +502,45 @@ namespace GDB.App.Presentation.UI
             Console.Write("Enter Account Number: ");
             string accountNumber = Console.ReadLine()!;
 
+            if (!IsValidAccountNumberInput(accountNumber))
+            {
+                Console.WriteLine(
+                    "Invalid account number. Please enter a 10-digit numeric account number.");
+
+                return;
+            }
+
             try
             {
                 TransactionController controller =
                     new TransactionController();
 
-                List<ViewRecentTransactionsResponseDto> transactions =await
-                    controller.GetRecentTransactionsAsync(accountNumber);
+                // Controller returns ActionResult<List<...>>
+                ActionResult<List<ViewRecentTransactionsResponseDto>> result =
+                    await controller.GetRecentTransactionsAsync(
+                        accountNumber);
+
+                List<ViewRecentTransactionsResponseDto> transactions;
+
+                if (result.Result is OkObjectResult okResult &&
+                    okResult.Value is List<ViewRecentTransactionsResponseDto> list)
+                {
+                    transactions = list;
+                }
+                else
+                {
+                    Console.WriteLine();
+                    Console.WriteLine("No transactions found.");
+
+                    if (result.Result is ObjectResult errorResult &&
+                        errorResult.Value != null)
+                    {
+                        Console.WriteLine(
+                            $"Error: {errorResult.Value}");
+                    }
+
+                    return;
+                }
 
                 if (transactions.Count == 0)
                 {
@@ -377,8 +552,9 @@ namespace GDB.App.Presentation.UI
                 Console.WriteLine();
                 Console.WriteLine("===== RECENT TRANSACTIONS =====");
 
-                foreach (ViewRecentTransactionsResponseDto transaction
-                         in transactions)
+                foreach (
+                    ViewRecentTransactionsResponseDto transaction
+                    in transactions)
                 {
                     Console.WriteLine();
                     Console.WriteLine("-------------------------------");
@@ -395,7 +571,8 @@ namespace GDB.App.Presentation.UI
                     Console.WriteLine(
                         $"Transaction Type : {transaction.TransactionType}");
 
-                    Console.WriteLine($"Amount  : {FormatRupee(transaction.Amount)}");
+                    Console.WriteLine(
+                        $"Amount           : {FormatRupee(transaction.Amount)}");
 
                     Console.WriteLine(
                         $"Status           : {transaction.TransactionStatus}");
@@ -425,15 +602,21 @@ namespace GDB.App.Presentation.UI
                 Console.WriteLine($"Error: {ex.Message}");
             }
         }
+
+        // ============================================================
+        // WITHDRAW
+        // ============================================================
+
         public async Task WithdrawAsync()
         {
             Console.WriteLine("Enter Account Number:");
             string accountNumber = Console.ReadLine().Trim();
 
-            // Check if the user has entered valid Account Number or not
             while (!IsValidAccountNumberInput(accountNumber))
             {
-                Console.WriteLine("Invalid account number. Please enter a 10-digit numeric account number.");
+                Console.WriteLine(
+                    "Invalid account number. Please enter a 10-digit numeric account number.");
+
                 Console.Write("Enter Account Number: ");
                 accountNumber = Console.ReadLine()!;
             }
@@ -441,77 +624,141 @@ namespace GDB.App.Presentation.UI
             Console.WriteLine("Enter PIN:");
             string pin = Console.ReadLine().Trim();
 
-            // Check if the user has entered valid Account Number or not
-            while (!IsValidAccountNumberInput(accountNumber))
+            // FIXED:
+            // Previously account number was being validated here.
+            // Now PIN is validated correctly.
+            while (!IsValidPinInput(pin))
             {
-                Console.WriteLine("Invalid account number. Please enter a 10-digit numeric account number.");
-                Console.Write("Enter Account Number: ");
-                accountNumber = Console.ReadLine()!;
+                Console.WriteLine(
+                    "Invalid PIN. Please enter a 4-digit numeric PIN.");
+
+                Console.Write("Enter PIN: ");
+                pin = Console.ReadLine()!;
             }
 
             Console.WriteLine("Enter Amount:");
-            decimal amount = decimal.Parse(Console.ReadLine().Trim());
+            decimal amount =
+                decimal.Parse(Console.ReadLine().Trim());
 
             try
             {
                 TransactionController controller =
                     new TransactionController();
 
-                var account = await controller.WithdrawAsync(
-                    accountNumber,
-                    pin,
-                    amount
-                );
+                TransactionDto request = new TransactionDto()
+                {
+                    AccountNumber = accountNumber,
+                    Pin = pin,
+                    Amount = amount
+                };
 
-                Console.WriteLine($"Balance  : {FormatRupee(account.Balance)}");
-                Console.WriteLine("Status: " + account.TransactionStat);
+                ActionResult<WithdrawResponseDto> result =
+                    await controller.WithdrawAsync(request);
+
+                if (result.Result is OkObjectResult okResult &&
+                    okResult.Value is WithdrawResponseDto account)
+                {
+                    Console.WriteLine(
+                        $"Balance : {FormatRupee(account.Balance)}");
+
+                    Console.WriteLine(
+                        "Status: " + account.TransactionStat);
+                }
+                else
+                {
+                    Console.WriteLine("Withdrawal failed.");
+
+                    if (result.Result is ObjectResult errorResult &&
+                        errorResult.Value != null)
+                    {
+                        Console.WriteLine(
+                            $"Error: {errorResult.Value}");
+                    }
+                }
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
             }
-
         }
+
+        // ============================================================
+        // DEPOSIT
+        // ============================================================
+
         public async Task DepositAsync()
         {
             Console.WriteLine("Enter Account Number:");
             string accountNumber = Console.ReadLine();
 
-            // Check if the user has entered valid Account Number or not
             while (!IsValidAccountNumberInput(accountNumber))
             {
-                Console.WriteLine("Invalid account number. Please enter a 10-digit numeric account number.");
+                Console.WriteLine(
+                    "Invalid account number. Please enter a 10-digit numeric account number.");
+
                 Console.Write("Enter Account Number: ");
                 accountNumber = Console.ReadLine()!;
             }
 
             Console.WriteLine("Enter Amount:");
-            decimal amount = decimal.Parse(Console.ReadLine());
+            decimal amount =
+                decimal.Parse(Console.ReadLine());
 
             try
             {
                 TransactionController controller =
                     new TransactionController();
 
-                var account = await controller.DepositAsync(accountNumber, amount);
+                TransactionDto request = new TransactionDto()
+                {
+                    AccountNumber = accountNumber,
+                    Amount = amount
+                };
 
-                Console.WriteLine($"Balance   : {FormatRupee(account.Balance)}");
-                Console.WriteLine("Status: " + account.TransactionStat);
+                ActionResult<DepositResponseDto> result =
+                    await controller.DepositAsync(request);
+
+                if (result.Result is OkObjectResult okResult &&
+                    okResult.Value is DepositResponseDto account)
+                {
+                    Console.WriteLine(
+                        $"Balance : {FormatRupee(account.Balance)}");
+
+                    Console.WriteLine(
+                        "Status: " + account.TransactionStat);
+                }
+                else
+                {
+                    Console.WriteLine("Deposit failed.");
+
+                    if (result.Result is ObjectResult errorResult &&
+                        errorResult.Value != null)
+                    {
+                        Console.WriteLine(
+                            $"Error: {errorResult.Value}");
+                    }
+                }
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
             }
         }
+
+        // ============================================================
+        // TRANSFER FUNDS
+        // ============================================================
+
         public async Task TransferFundsAsync()
         {
             Console.WriteLine("Enter From Account Number:");
             string fromAccountNumber = Console.ReadLine();
 
-            // Check if the user has entered valid Account Number or not
             while (!IsValidAccountNumberInput(fromAccountNumber))
             {
-                Console.WriteLine("Invalid account number. Please enter a 10-digit numeric account number.");
+                Console.WriteLine(
+                    "Invalid account number. Please enter a 10-digit numeric account number.");
+
                 Console.Write("Enter Account Number: ");
                 fromAccountNumber = Console.ReadLine()!;
             }
@@ -519,55 +766,84 @@ namespace GDB.App.Presentation.UI
             Console.WriteLine("Enter To Account Number:");
             string toAccountNumber = Console.ReadLine();
 
-            // Check if the user has entered valid Account Number or not
             while (!IsValidAccountNumberInput(toAccountNumber))
             {
-                Console.WriteLine("Invalid account number. Please enter a 10-digit numeric account number.");
+                Console.WriteLine(
+                    "Invalid account number. Please enter a 10-digit numeric account number.");
+
                 Console.Write("Enter Account Number: ");
                 toAccountNumber = Console.ReadLine()!;
             }
 
-            // Check if the user has entered valid PIN or not
             Console.Write("Enter PIN: ");
             var pin = Console.ReadLine()!.Trim();
 
             while (!IsValidPinInput(pin))
             {
-                Console.WriteLine("Invalid PIN. Please enter a 4-digit numeric PIN.");
+                Console.WriteLine(
+                    "Invalid PIN. Please enter a 4-digit numeric PIN.");
+
                 Console.Write("Enter PIN: ");
                 pin = Console.ReadLine()!.Trim();
             }
 
             Console.WriteLine("Enter Amount:");
-            decimal amount = decimal.Parse(Console.ReadLine());
+            decimal amount =
+                decimal.Parse(Console.ReadLine());
 
             try
             {
                 if (fromAccountNumber.Equals(toAccountNumber))
                 {
-                    throw new AccountException("\nSource Account and Destination Account cannot be the same");
+                    throw new AccountException(
+                        "\nSource Account and Destination Account cannot be the same");
                 }
+
                 TransactionController controller =
                     new TransactionController();
 
-                var result = await
-                    controller.TransferFundsAsync(
-                        fromAccountNumber,
-                        toAccountNumber,
-                        pin,
-                        amount
-                    );
+                TransactionDto request = new TransactionDto()
+                {
+                    FromAccount = fromAccountNumber,
+                    ToAccount = toAccountNumber,
+                    Pin = pin,
+                    Amount = amount
+                };
 
-                Console.WriteLine();
-                
-                Console.WriteLine($"Transaction Status: {result.TransactionStat}");
-                
+                ActionResult<TranferFundsResponseDto> actionResult =
+                    await controller.TransferFundsAsync(request);
+
+                if (actionResult.Result is OkObjectResult okResult &&
+                    okResult.Value is TranferFundsResponseDto result)
+                {
+                    Console.WriteLine();
+
+                    Console.WriteLine(
+                        $"Transaction Status: {result.TransactionStat}");
+                }
+                else
+                {
+                    Console.WriteLine();
+                    Console.WriteLine("Transfer failed.");
+
+                    if (actionResult.Result is ObjectResult errorResult &&
+                        errorResult.Value != null)
+                    {
+                        Console.WriteLine(
+                            $"Error: {errorResult.Value}");
+                    }
+                }
             }
             catch (Exception ex)
             {
                 Console.WriteLine("\n" + ex.Message);
             }
         }
+
+        // ============================================================
+        // CLOSE ACCOUNT
+        // ============================================================
+
         public async Task CloseAccountAsync()
         {
             Console.WriteLine("===== CLOSE ACCOUNT =====");
@@ -575,10 +851,11 @@ namespace GDB.App.Presentation.UI
             Console.Write("Enter Account Number: ");
             string accountNumber = Console.ReadLine()!;
 
-            // Check if the user has entered valid Account Number or not
             while (!IsValidAccountNumberInput(accountNumber))
             {
-                Console.WriteLine("Invalid account number. Please enter a 10-digit numeric account number.");
+                Console.WriteLine(
+                    "Invalid account number. Please enter a 10-digit numeric account number.");
+
                 Console.Write("Enter Account Number: ");
                 accountNumber = Console.ReadLine()!;
             }
@@ -591,30 +868,58 @@ namespace GDB.App.Presentation.UI
                         AccountNumber = accountNumber
                     };
 
-                AccountController controller =new AccountController();
+                AccountController controller =
+                    new AccountController();
 
-                CloseAccountResponseDto response = await controller.CloseAccountAsync(request);
+                /*
+                 * Controller returns IActionResult.
+                 * Unwrap the CloseAccountResponseDto from the result.
+                 */
+                IActionResult result =
+                    await controller.CloseAccountAsync(request);
 
-                Console.WriteLine();
-                Console.WriteLine("===== ACCOUNT CLOSED =====");
-                Console.WriteLine($"Account Number : {response.AccountNumber}");
-                Console.WriteLine($"Status         : {response.Status}");
-                Console.WriteLine($"Message        : {response.Message}");
+                if (result is OkObjectResult okResult &&
+                    okResult.Value is CloseAccountResponseDto response)
+                {
+                    Console.WriteLine();
+                    Console.WriteLine("===== ACCOUNT CLOSED =====");
+
+                    Console.WriteLine(
+                        $"Account Number : {response.AccountNumber}");
+
+                    Console.WriteLine(
+                        $"Status         : {response.Status}");
+
+                    Console.WriteLine(
+                        $"Message        : {response.Message}");
+                }
+                else
+                {
+                    Console.WriteLine();
+                    Console.WriteLine("Account close failed.");
+
+                    if (result is ObjectResult errorResult &&
+                        errorResult.Value != null)
+                    {
+                        Console.WriteLine(
+                            $"Error: {errorResult.Value}");
+                    }
+                }
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"\nError: {ex.Message}");
             }
         }
+
+        // ============================================================
+        // EXIT
+        // ============================================================
+
         public void Exit()
         {
             Console.WriteLine("\nThank you for using GDB.");
             choice = 0;
         }
-
-        
-
     }
 }
-
-

@@ -1,4 +1,4 @@
-namespace GDB.App.Infrastructure.Repositories.Contracts
+namespace GdbWebApi.Infrastructure.Repositories.Contracts
 {
     public interface IHomeRepository
     {

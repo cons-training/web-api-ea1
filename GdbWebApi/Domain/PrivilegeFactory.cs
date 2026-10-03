@@ -1,12 +1,12 @@
-﻿using GDB.App.Domain.Enums;
-using GDB.App.Domain.Models;
+﻿using GdbWebApi.Domain.Enums;
+using GdbWebApi.Domain.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GDB.App.Domain
+namespace GdbWebApi.Domain
 {
     public class PrivilegeFactory 
     {

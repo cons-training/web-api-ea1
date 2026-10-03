@@ -1,10 +1,10 @@
 ﻿using System;
-using GDB.App.Domain;
-using GDB.App.Domain.Enums;
-using GDB.App.Domain.Exceptions;
+using GdbWebApi.Domain;
+using GdbWebApi.Domain.Enums;
+using GdbWebApi.Domain.Exceptions;
 
 
-namespace GDB.App.Domain.Models
+namespace GdbWebApi.Domain.Models
 {
     public class CurrentAccount : Account
     {

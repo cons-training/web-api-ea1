@@ -1,13 +1,13 @@
-﻿using GDB.App.Infrastructure.Repositories.Contracts;
-using GDB.App.Infrastructure.Repositories.Implementations;
+﻿using GdbWebApi.Infrastructure.Repositories.Contracts;
+using GdbWebApi.Infrastructure.Repositories.Implementations;
 using gdb.Logging;
 using Microsoft.Extensions.Logging;
 
-namespace GDB.App.Infrastructure.Repositories
+namespace GdbWebApi.Infrastructure.Repositories
 {
     public static class TransactionRepositoryFactory
     {
-        private static readonly ILogger _logger = AppLogger.CreateLogger("GDB.App.Infrastructure.Repositories.TransactionRepositoryFactory");
+        private static readonly ILogger _logger = AppLogger.CreateLogger("GdbWebApi.Infrastructure.Repositories.TransactionRepositoryFactory");
 
         public static ITransactionRepository Create(string type)
         {

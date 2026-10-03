@@ -1,14 +1,14 @@
-﻿using GDB.App.Application.Services.Implementations;
-using GDB.App.Domain;
-using GDB.App.Domain.Enums;
-using GDB.App.Domain.Exceptions;
-using GDB.App.Domain.Models;
-using GDB.App.Infrastructure.Repositories;
+﻿using GdbWebApi.Application.Services.Implementations;
+using GdbWebApi.Domain;
+using GdbWebApi.Domain.Enums;
+using GdbWebApi.Domain.Exceptions;
+using GdbWebApi.Domain.Models;
+using GdbWebApi.Infrastructure.Repositories;
 using System;
 using System.Text;
 
 
-namespace GDB.App.Presentation.UI
+namespace GdbWebApi.Presentation.UI
 {
     public class TestAbstractAccount
     {

@@ -1,11 +1,11 @@
-﻿using GDB.App.Application.Dtos;
-using GDB.App.Application.Services.Contracts;
-using GDB.App.Domain;
-using GDB.App.Domain.Enums;
-using GDB.App.Domain.Models;
-using GDB.App.Infrastructure.Repositories;
-using GDB.App.Infrastructure.Repositories.Contracts;
-using GDB.App.Infrastructure.Repositories.Implementations;
+﻿using GdbWebApi.Application.Dtos;
+using GdbWebApi.Application.Services.Contracts;
+using GdbWebApi.Domain;
+using GdbWebApi.Domain.Enums;
+using GdbWebApi.Domain.Models;
+using GdbWebApi.Infrastructure.Repositories;
+using GdbWebApi.Infrastructure.Repositories.Contracts;
+using GdbWebApi.Infrastructure.Repositories.Implementations;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,7 +16,7 @@ using System.Xml.Linq;
 using gdb.Logging;
 using Microsoft.Extensions.Logging;
 
-namespace GDB.App.Application.Services.Implementations
+namespace GdbWebApi.Application.Services.Implementations
 {
     /// <summary>
     /// Provides business logic and service operations for account management within the Global Digital Bank application.
