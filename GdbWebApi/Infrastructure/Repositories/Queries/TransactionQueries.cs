@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GDB.App.Infrastructure.Repositories.Queries
+namespace GdbWebApi.Infrastructure.Repositories.Queries
 {
     internal static class TransactionQueries
     {

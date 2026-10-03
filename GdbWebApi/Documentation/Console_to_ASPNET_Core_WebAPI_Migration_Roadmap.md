@@ -14,7 +14,7 @@ Migrate the **Global Digital Bank (GDB)** C# Console Application into a producti
 
 | Dimension | Scope |
 |---|---|
-| Source Application | .NET 8 Console Application (GDB.App) — Banking system with accounts, transactions, domain models, services, repositories, factories |
+| Source Application | .NET 8 Console Application (GdbWebApi) — Banking system with accounts, transactions, domain models, services, repositories, factories |
 | Target Application | ASP.NET Core 8 Web API with layered architecture |
 | Database | SQL Server (via stored procedures + raw ADO.NET) + InMemory DataSet fallback |
 | Authentication | JWT Bearer with 4 roles: User, Manager, Teller, Admin |
@@ -95,8 +95,8 @@ graph TD
 ## 2.2 Project Inventory
 
 ### Solution Structure
-- **Solution File**: [GDB.App.slnx](file:///c:/GDB/gdb/GDB.App.slnx) — Contains single project `GDB.App.csproj`
-- **Project File**: [GDB.App.csproj](file:///c:/GDB/gdb/GDB.App.csproj) — .NET 8, OutputType `Exe`
+- **Solution File**: [GdbWebApi.slnx](file:///c:/GDB/gdb/GdbWebApi.slnx) — Contains single project `GdbWebApi.csproj`
+- **Project File**: [GdbWebApi.csproj](file:///c:/GDB/gdb/GdbWebApi.csproj) — .NET 8, OutputType `Exe`
 - **Target Framework**: `net8.0` with implicit usings and nullable enabled
 
 ### NuGet Dependencies
@@ -115,7 +115,7 @@ graph TD
 
 ### Folder Structure (Source)
 ```
-GDB.App/
+GdbWebApi/
 ├── Application/
 │   ├── Controllers/
 │   │   ├── AccountController.cs          (75 lines)
@@ -206,7 +206,7 @@ GDB.App/
 │       └── TestAbstractAccount.cs (entry point)
 ├── App.config
 ├── appsettings.json
-└── GDB.App.csproj
+└── GdbWebApi.csproj
 ```
 
 ## 2.3 Business Functionality Inventory
@@ -244,7 +244,7 @@ GDB.App/
 | TD-5 | `PrivilegeFactory` is empty — dead code | Low | [PrivilegeFactory.cs](file:///c:/GDB/gdb/Domain/PrivilegeFactory.cs) |
 | TD-6 | `PrivilegeRepository` has only static data, no interface | Low | [PrivilegeRepository.cs](file:///c:/GDB/gdb/Infrastructure/Repositories/Implementations/PrivilegeRepository.cs) |
 | TD-7 | `DBTesting.cs` is entirely commented out | Low | [DBTesting.cs](file:///c:/GDB/gdb/Presentation/UI/DBTesting.cs) |
-| TD-8 | Duplicate SQL client packages (`System.Data.SqlClient` + `Microsoft.Data.SqlClient`) | Low | [GDB.App.csproj:12-13](file:///c:/GDB/gdb/GDB.App.csproj#L12-L13) |
+| TD-8 | Duplicate SQL client packages (`System.Data.SqlClient` + `Microsoft.Data.SqlClient`) | Low | [GdbWebApi.csproj:12-13](file:///c:/GDB/gdb/GdbWebApi.csproj#L12-L13) |
 | TD-9 | Connection string uses `ConfigurationManager` (App.config) — not ASP.NET Core compatible | High | [DataBaseConnectionManager.cs:20](file:///c:/GDB/gdb/Infrastructure/Repositories/DataBaseConnectionManager.cs#L20) |
 | TD-10 | Typo in filename: `InsufficeintBalanceException.cs` | Low | [InsufficeintBalanceException.cs](file:///c:/GDB/gdb/Domain/Exceptions/InsufficeintBalanceException.cs) |
 | TD-11 | `GetAllAccounts()` is synchronous while other repo methods are async | Medium | [IAccountService.cs:25](file:///c:/GDB/gdb/Application/Services/Contracts/IAccountService.cs#L25) |
@@ -361,7 +361,7 @@ GDB/
 │   │   ├── Dockerfile
 │   │   └── .dockerignore
 │   │
-│   └── GDB.App/                          # Existing Console App (Modified to HTTP Client in R8)
+│   └── GdbWebApi/                          # Existing Console App (Modified to HTTP Client in R8)
 │       ├── Application/
 │       │   ├── Controllers/              # Preserved for backward compat until R8
 │       │   ├── Dtos/                     # Shared DTOs
@@ -379,16 +379,16 @@ GDB/
 
 | Existing Component | Target Location | Migration Action |
 |---|---|---|
-| `Presentation/UI/Home.cs` | `GDB.App/Presentation/UI/Home.cs` | Refactor to HTTP client (R8) |
-| `Presentation/UI/TestAbstractAccount.cs` | `GDB.App/Program.cs` | Simplify entry point |
+| `Presentation/UI/Home.cs` | `GdbWebApi/Presentation/UI/Home.cs` | Refactor to HTTP client (R8) |
+| `Presentation/UI/TestAbstractAccount.cs` | `GdbWebApi/Program.cs` | Simplify entry point |
 | `Application/Controllers/AccountController.cs` | `GDB.Api/Controllers/AccountsController.cs` | Replace with ASP.NET Core ApiController |
 | `Application/Controllers/TransactionController.cs` | `GDB.Api/Controllers/TransactionsController.cs` | Replace with ASP.NET Core ApiController |
-| `Application/Services/*` | `GDB.App/Application/Services/*` | Modify access modifiers, add DI constructors |
-| `Application/Dtos/*` | `GDB.App/Application/Dtos/*` | Add validation attributes (R4) |
-| `Domain/*` | `GDB.App/Domain/*` | Reuse without modification |
-| `Infrastructure/Repositories/*` | `GDB.App/Infrastructure/Repositories/*` | Modify connection management for DI |
+| `Application/Services/*` | `GdbWebApi/Application/Services/*` | Modify access modifiers, add DI constructors |
+| `Application/Dtos/*` | `GdbWebApi/Application/Dtos/*` | Add validation attributes (R4) |
+| `Domain/*` | `GdbWebApi/Domain/*` | Reuse without modification |
+| `Infrastructure/Repositories/*` | `GdbWebApi/Infrastructure/Repositories/*` | Modify connection management for DI |
 | `Logging/*` | `GDB.Api/` (via ASP.NET Core logging) | Replace static loggers with DI-injected ILogger |
-| `Data/GDBInMemoryDB.cs` | `GDB.App/Data/GDBInMemoryDB.cs` | Reuse without modification |
+| `Data/GDBInMemoryDB.cs` | `GdbWebApi/Data/GDBInMemoryDB.cs` | Reuse without modification |
 | `App.config` | `GDB.Api/appsettings.json` | Migrate connection strings |
 | Service Factories | Removed in R3 | Replace with DI service registration |
 | Repository Factories | Removed in R3 | Replace with DI service registration |
@@ -427,7 +427,7 @@ sequenceDiagram
 
 | ADR | Decision | Rationale |
 |---|---|---|
-| ADR-1 | **Two-project solution** (GDB.Api + GDB.App) rather than multi-project layered split | The existing codebase is ~3000 LOC. Splitting into 5+ class libraries would add unnecessary complexity. The API project references the existing project. |
+| ADR-1 | **Two-project solution** (GDB.Api + GdbWebApi) rather than multi-project layered split | The existing codebase is ~3000 LOC. Splitting into 5+ class libraries would add unnecessary complexity. The API project references the existing project. |
 | ADR-2 | **Preserve `AccountFactory`** as domain logic | The `AccountFactory` implements legitimate domain polymorphism (4 account types with type-specific parameters). It is not a DI substitute. |
 | ADR-3 | **Remove service/repository factories**, replace with DI | `AccountServiceFactory`, `TransactionServiceFactory`, `AccountRepositoryFactory`, `TransactionRepositoryFactory` exist solely to construct dependencies — this is DI's responsibility. |
 | ADR-4 | **Keep ADO.NET with stored procedures** — do not introduce EF Core | The existing data access uses raw `DbCommand` with stored procedures. Introducing EF Core would be a second migration inside this migration. |
@@ -512,15 +512,15 @@ gantt
 - **F1.2.1** — Create Web API project
   - T1.2.1.1 — Create new solution file `GDB.sln`
   - T1.2.1.2 — Create `GDB.Api` Web API project (net8.0)
-  - T1.2.1.3 — Add `GDB.App.csproj` to the new solution
-  - T1.2.1.4 — Add project reference: `GDB.Api` → `GDB.App`
-  - T1.2.1.5 — Remove `OutputType Exe` from `GDB.App.csproj` (make it a class library)
+  - T1.2.1.3 — Add `GdbWebApi.csproj` to the new solution
+  - T1.2.1.4 — Add project reference: `GDB.Api` → `GdbWebApi`
+  - T1.2.1.5 — Remove `OutputType Exe` from `GdbWebApi.csproj` (make it a class library)
   - T1.2.1.6 — Move/copy entry point logic to `GDB.Api/Program.cs`
   - T1.2.1.7 — Verify both projects build successfully
 - **F1.2.2** — NuGet dependency setup
   - T1.2.2.1 — Add required NuGet packages to `GDB.Api` (Swashbuckle, Serilog.AspNetCore)
   - T1.2.2.2 — Verify package compatibility with .NET 8
-  - T1.2.2.3 — Remove `System.Data.SqlClient` from `GDB.App` (keep only `Microsoft.Data.SqlClient`)
+  - T1.2.2.3 — Remove `System.Data.SqlClient` from `GdbWebApi` (keep only `Microsoft.Data.SqlClient`)
 
 #### L3: E1.3 — API Foundation Configuration
 - **F1.3.1** — Program.cs and startup configuration
@@ -763,7 +763,7 @@ gantt
 
 #### L3: E8.1 — HTTP Client Infrastructure
 - **F8.1.1** — Configure HttpClient
-  - T8.1.1.1 — Add `Microsoft.Extensions.Http` to `GDB.App`
+  - T8.1.1.1 — Add `Microsoft.Extensions.Http` to `GdbWebApi`
   - T8.1.1.2 — Create `IGdbApiClient` interface
   - T8.1.1.3 — Create `GdbApiClient` typed HTTP client class
   - T8.1.1.4 — Configure base URL from configuration
@@ -830,9 +830,9 @@ gantt
 | T1.1.1.5 | R1 | D2 | E1.1 | Create `develop` branch | Dev A | 0.5 | T1.1.1.2 | P1 | Branch created | Branch exists and is set as default |
 | T1.2.1.1 | R1 | D2 | E1.2 | Create new `GDB.sln` solution file | Dev B | 1 | T1.1.1.5 | P1 | Solution file | `dotnet build GDB.sln` succeeds |
 | T1.2.1.2 | R1 | D2 | E1.2 | Create `GDB.Api` Web API project | Dev B | 1 | T1.2.1.1 | P1 | API project | Project created targeting net8.0 |
-| T1.2.1.3 | R1 | D2 | E1.2 | Add `GDB.App.csproj` to solution | Dev B | 0.5 | T1.2.1.1 | P1 | Solution updated | Both projects in solution |
-| T1.2.1.4 | R1 | D2 | E1.2 | Add project reference GDB.Api → GDB.App | Dev B | 0.5 | T1.2.1.2 | P1 | Reference added | API can reference App types |
-| T1.2.1.5 | R1 | D2 | E1.2 | Convert GDB.App from Exe to Library | Dev B | 1 | T1.2.1.4 | P1 | csproj updated | OutputType removed, builds as library |
+| T1.2.1.3 | R1 | D2 | E1.2 | Add `GdbWebApi.csproj` to solution | Dev B | 0.5 | T1.2.1.1 | P1 | Solution updated | Both projects in solution |
+| T1.2.1.4 | R1 | D2 | E1.2 | Add project reference GDB.Api → GdbWebApi | Dev B | 0.5 | T1.2.1.2 | P1 | Reference added | API can reference App types |
+| T1.2.1.5 | R1 | D2 | E1.2 | Convert GdbWebApi from Exe to Library | Dev B | 1 | T1.2.1.4 | P1 | csproj updated | OutputType removed, builds as library |
 | T1.2.1.6 | R1 | D2 | E1.2 | Move entry point to GDB.Api/Program.cs | Dev B | 1.5 | T1.2.1.5 | P1 | Program.cs | API starts, console app builds |
 | T1.2.1.7 | R1 | D2 | E1.2 | Verify both projects build | Dev B | 0.5 | T1.2.1.6 | P1 | Build log | `dotnet build` succeeds |
 | T1.2.2.1 | R1 | D2 | E1.2 | Add NuGet packages to GDB.Api | Dev C | 1 | T1.2.1.2 | P1 | Packages installed | Swashbuckle, Serilog packages added |
@@ -902,7 +902,7 @@ The remaining task registers follow the same format and are detailed within the 
 
 | Day | Dev A (6 hrs) | Dev B (6 hrs) | Dev C (6 hrs) |
 |---|---|---|---|
-| **Day 1** | T1.1.1.1 Inspect repo (1h)<br/>T1.1.1.2 Define Git workflow (1h)<br/>T1.1.1.3 Commit conventions (0.5h)<br/>T1.1.1.4 PR process (1h)<br/>T1.1.1.5 Create develop branch (0.5h)<br/>T1.3.1.6 appsettings.json (1h)<br/>T1.3.1.7 appsettings.Dev (0.5h) | T1.2.1.1 Create GDB.sln (1h)<br/>T1.2.1.2 Create GDB.Api (1h)<br/>T1.2.1.3 Add GDB.App to sln (0.5h)<br/>T1.2.1.4 Project reference (0.5h)<br/>T1.2.1.5 Convert to library (1h)<br/>T1.2.1.6 Move entry point (1.5h) | T1.2.2.1 NuGet packages (1h)<br/>T1.2.2.2 Compatibility check (0.5h)<br/>T1.2.2.3 Remove SqlClient dup (0.5h)<br/>T1.3.1.1 Program.cs config (1.5h)<br/>T1.3.1.2 Controller services (0.5h)<br/>T1.3.1.3 JSON serialization (0.5h)<br/>T1.3.1.4 Swagger setup (1h) |
+| **Day 1** | T1.1.1.1 Inspect repo (1h)<br/>T1.1.1.2 Define Git workflow (1h)<br/>T1.1.1.3 Commit conventions (0.5h)<br/>T1.1.1.4 PR process (1h)<br/>T1.1.1.5 Create develop branch (0.5h)<br/>T1.3.1.6 appsettings.json (1h)<br/>T1.3.1.7 appsettings.Dev (0.5h) | T1.2.1.1 Create GDB.sln (1h)<br/>T1.2.1.2 Create GDB.Api (1h)<br/>T1.2.1.3 Add GdbWebApi to sln (0.5h)<br/>T1.2.1.4 Project reference (0.5h)<br/>T1.2.1.5 Convert to library (1h)<br/>T1.2.1.6 Move entry point (1.5h) | T1.2.2.1 NuGet packages (1h)<br/>T1.2.2.2 Compatibility check (0.5h)<br/>T1.2.2.3 Remove SqlClient dup (0.5h)<br/>T1.3.1.1 Program.cs config (1.5h)<br/>T1.3.1.2 Controller services (0.5h)<br/>T1.3.1.3 JSON serialization (0.5h)<br/>T1.3.1.4 Swagger setup (1h) |
 | **Day 2** | T1.3.1.8 Update .gitignore (0.5h)<br/>Code review (2h)<br/>Integration support (3.5h) | T1.2.1.7 Verify build (0.5h)<br/>T1.3.2.1 HealthController (1h)<br/>T1.3.2.2 Verify Swagger (0.5h)<br/>T1.3.2.3 Verify 200 OK (0.5h)<br/>Integration debugging (3h) | T1.3.1.5 Middleware pipeline (0.5h)<br/>Integration support (3h)<br/>Documentation (2.5h) |
 | **Day 3** | Integration testing (3h)<br/>Bug fixes (3h) | Integration testing (3h)<br/>Bug fixes (3h) | Integration testing (3h)<br/>Bug fixes (3h) |
 | **Day 4** | T1.3.2.4 Git commit (0.5h)<br/>Sprint review (1.5h)<br/>Release verification (2h)<br/>Documentation (2h) | Sprint review (1.5h)<br/>Release verification (2h)<br/>Documentation (2.5h) | Sprint review (1.5h)<br/>Release verification (2h)<br/>Documentation (2.5h) |
@@ -1084,7 +1084,7 @@ The remaining task registers follow the same format and are detailed within the 
 | **Excluded** | Business endpoints, authentication, Docker |
 | **Acceptance Criteria** | ✅ API starts on configured port<br/>✅ Swagger UI loads<br/>✅ GET /api/health returns 200<br/>✅ Both projects build<br/>✅ Git workflow established |
 | **Verification** | `dotnet build GDB.sln` succeeds; `dotnet run --project GDB.Api` starts; Swagger accessible |
-| **Rollback** | Revert to original `GDB.App.slnx` — console app unaffected |
+| **Rollback** | Revert to original `GdbWebApi.slnx` — console app unaffected |
 
 ## R2 — Complete Code & Controller Migration
 

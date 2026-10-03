@@ -1,7 +1,7 @@
-using GDB.App.Application.Services.Contracts;
-using GDB.App.Infrastructure.Repositories.Contracts;
+using GdbWebApi.Application.Services.Contracts;
+using GdbWebApi.Infrastructure.Repositories.Contracts;
 
-namespace GDB.App.Application.Services.Implementations
+namespace GdbWebApi.Application.Services.Implementations
 {
     public class HomeService : IHomeService
     {

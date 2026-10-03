@@ -1,10 +1,10 @@
-﻿using GDB.App.Application.Dtos;
-using GDB.App.Application.Services.Contracts;
-using GDB.App.Domain.Enums;
+﻿using GdbWebApi.Application.Dtos;
+using GdbWebApi.Application.Services.Contracts;
+using GdbWebApi.Domain.Enums;
 using gdb.Logging;
 using Microsoft.Extensions.Logging;
 
-namespace GDB.App.Application.Services.Implementations
+namespace GdbWebApi.Application.Services.Implementations
 {
     public class TransactionService : ITransactionService
     {

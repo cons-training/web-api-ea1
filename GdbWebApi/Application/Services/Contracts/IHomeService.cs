@@ -1,4 +1,4 @@
-namespace GDB.App.Application.Services.Contracts
+namespace GdbWebApi.Application.Services.Contracts
 {
     public interface IHomeService
     {

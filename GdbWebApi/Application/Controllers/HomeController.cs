@@ -1,4 +1,4 @@
-using GDB.App.Application.Services.Contracts;
+using GdbWebApi.Application.Services.Contracts;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GdbWebApi.Controllers

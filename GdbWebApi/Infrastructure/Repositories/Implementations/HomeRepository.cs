@@ -1,6 +1,6 @@
-using GDB.App.Infrastructure.Repositories.Contracts;
+using GdbWebApi.Infrastructure.Repositories.Contracts;
 
-namespace GDB.App.Infrastructure.Repositories.Implementations
+namespace GdbWebApi.Infrastructure.Repositories.Implementations
 {
     public class HomeRepository : IHomeRepository
     {

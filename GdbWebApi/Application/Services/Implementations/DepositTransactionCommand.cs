@@ -1,10 +1,10 @@
 ﻿using gdb.Logging;
-using GDB.App.Application.Dtos;
-using GDB.App.Application.Services.Contracts;
-using GDB.App.Domain.Enums;
-using GDB.App.Domain.Exceptions;
-using GDB.App.Domain.Models;
-using GDB.App.Infrastructure.Repositories.Contracts;
+using GdbWebApi.Application.Dtos;
+using GdbWebApi.Application.Services.Contracts;
+using GdbWebApi.Domain.Enums;
+using GdbWebApi.Domain.Exceptions;
+using GdbWebApi.Domain.Models;
+using GdbWebApi.Infrastructure.Repositories.Contracts;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -13,7 +13,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GDB.App.Application.Services.Implementations
+namespace GdbWebApi.Application.Services.Implementations
 {
     public class DepositTransactionCommand
         : ITransactionCommand<DepositResponseDto>

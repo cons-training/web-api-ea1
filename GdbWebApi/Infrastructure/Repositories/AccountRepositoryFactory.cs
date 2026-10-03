@@ -1,5 +1,5 @@
-﻿using GDB.App.Domain.Enums;
-using GDB.App.Domain.Exceptions;
+﻿using GdbWebApi.Domain.Enums;
+using GdbWebApi.Domain.Exceptions;
 
 using System;
 using System.Collections.Generic;
@@ -7,13 +7,13 @@ using System.Linq;
 using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
-using GDB.App.Infrastructure.Repositories.Implementations;
-using GDB.App.Infrastructure.Repositories.Contracts;
-using GDB.App.Domain.Models;
+using GdbWebApi.Infrastructure.Repositories.Implementations;
+using GdbWebApi.Infrastructure.Repositories.Contracts;
+using GdbWebApi.Domain.Models;
 using gdb.Logging;
 using Microsoft.Extensions.Logging;
 
-namespace GDB.App.Infrastructure.Repositories
+namespace GdbWebApi.Infrastructure.Repositories
 {
     class AccountRepositoryFactory
     {
