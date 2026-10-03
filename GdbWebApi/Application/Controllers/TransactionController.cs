@@ -1,28 +1,38 @@
+using Asp.Versioning;
 using GdbWebApi.Application.Dtos;
-using GdbWebApi.Application.Services;
 using GdbWebApi.Application.Services.Contracts;
+using GdbWebApi.Application.Services.Implementations;
 using GdbWebApi.Domain.Enums;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GdbWebApi.Application.Controllers
 {
     [ApiController]
+    [ApiVersion("1.0")]
+    [Route("api/v{version:apiVersion}/[controller]")]
     [Route("api/[controller]")]
     public class TransactionController : ControllerBase
     {
         private readonly ITransactionService _transactionService;
         private readonly ITransactionQueryService _transactionQueryService;
 
-        public TransactionController()
+        // DI Constructor (used by ASP.NET Core)
+        [Microsoft.Extensions.DependencyInjection.ActivatorUtilitiesConstructor]
+        public TransactionController(
+            ITransactionService transactionService,
+            ITransactionQueryService transactionQueryService)
         {
-            // Factory pattern intentionally retained for the release
-            _transactionService = TransactionServiceFactory.Create();
-
-            _transactionQueryService =
-                TransactionQueryServiceFactory.Create();
+            _transactionService = transactionService ?? throw new ArgumentNullException(nameof(transactionService));
+            _transactionQueryService = transactionQueryService ?? throw new ArgumentNullException(nameof(transactionQueryService));
         }
 
-        // POST: api/Transaction/deposit
+        // Fallback parameterless constructor for Console UI (Home.cs)
+        public TransactionController()
+            : this(new TransactionService(), new TransactionQueryService())
+        {
+        }
+
+        // POST: api/v1/Transaction/deposit
         [HttpPost("deposit")]
         public async Task<ActionResult<DepositResponseDto>> DepositAsync(
             [FromBody] DepositRequestDto request)
@@ -54,7 +64,7 @@ namespace GdbWebApi.Application.Controllers
             }
         }
 
-        // POST: api/Transaction/withdraw
+        // POST: api/v1/Transaction/withdraw
         [HttpPost("withdraw")]
         public async Task<ActionResult<WithdrawResponseDto>> WithdrawAsync(
             [FromBody] WithdrawRequestDto request)
@@ -87,7 +97,7 @@ namespace GdbWebApi.Application.Controllers
             }
         }
 
-        // POST: api/Transaction/transfer
+        // POST: api/v1/Transaction/transfer
         [HttpPost("transfer")]
         public async Task<ActionResult<TranferFundsResponseDto>> TransferFundsAsync(
             [FromBody] TransferRequestDto request)
@@ -121,7 +131,7 @@ namespace GdbWebApi.Application.Controllers
             }
         }
 
-        // GET: api/Transaction/{accountNumber}/recent
+        // GET: api/v1/Transaction/{accountNumber}/recent
         [HttpGet("{accountNumber}/recent")]
         public async Task<ActionResult<List<ViewRecentTransactionsResponseDto>>>
             GetRecentTransactionsAsync(string accountNumber)
