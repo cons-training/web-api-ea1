@@ -1,4 +1,4 @@
-﻿using GdbWebApi.Application.Controllers;
+using GdbWebApi.Application.Controllers;
 using GdbWebApi.Application.Dtos;
 using GdbWebApi.Application.Services.Contracts;
 using GdbWebApi.Application.Services.Implementations;
@@ -645,7 +645,7 @@ namespace GdbWebApi.Presentation.UI
                 TransactionController controller =
                     new TransactionController();
 
-                TransactionDto request = new TransactionDto()
+                WithdrawRequestDto request = new WithdrawRequestDto()
                 {
                     AccountNumber = accountNumber,
                     Pin = pin,
@@ -709,7 +709,7 @@ namespace GdbWebApi.Presentation.UI
                 TransactionController controller =
                     new TransactionController();
 
-                TransactionDto request = new TransactionDto()
+                DepositRequestDto request = new DepositRequestDto()
                 {
                     AccountNumber = accountNumber,
                     Amount = amount
@@ -802,7 +802,7 @@ namespace GdbWebApi.Presentation.UI
                 TransactionController controller =
                     new TransactionController();
 
-                TransactionDto request = new TransactionDto()
+                TransferRequestDto request = new TransferRequestDto()
                 {
                     FromAccount = fromAccountNumber,
                     ToAccount = toAccountNumber,
