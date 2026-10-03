@@ -54,17 +54,20 @@ namespace GdbWebApi.Application.Services.Implementations
         private static readonly ILogger _logger = AppLogger.CreateLogger<AccountService>();
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="AccountService"/> class.
+        /// Initializes a new instance of the <see cref="AccountService"/> class using dependency injection.
         /// </summary>
-        /// <remarks>
-        /// This constructor initializes the account repository using the factory pattern.
-        /// The repository is configured to use the database ("DB") as the data source,
-        /// allowing for abstraction of the underlying data storage mechanism.
-        /// </remarks>
-        public AccountService()
+        /// <param name="accountRepository">The repository used for account data access.</param>
+        public AccountService(IAccountRepository accountRepository)
         {
-            // Repository is created via factory pattern for loose coupling
-            _accountRepository = AccountRepositoryFactory.Create("DB");
+            _accountRepository = accountRepository ?? throw new ArgumentNullException(nameof(accountRepository));
+        }
+
+        /// <summary>
+        /// Fallback parameterless constructor.
+        /// </summary>
+        public AccountService()
+            : this(new AccountRepositoryDB())
+        {
         }
 
         /// <summary>
