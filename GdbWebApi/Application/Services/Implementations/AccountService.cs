@@ -1,4 +1,4 @@
-﻿using GdbWebApi.Application.Dtos;
+using GdbWebApi.Application.Dtos;
 using GdbWebApi.Application.Services.Contracts;
 using GdbWebApi.Domain;
 using GdbWebApi.Domain.Enums;
@@ -136,7 +136,8 @@ namespace GdbWebApi.Application.Services.Implementations
                     Balance = account.Balance,
                     AccountPrivilege = account.Privilege,
                     AccountType = account.AccountType,
-                    Age = account.Age
+                    Age = account.Age,
+                    AccountStatus = account.Status
                 });
             }
 
@@ -166,6 +167,11 @@ namespace GdbWebApi.Application.Services.Implementations
         {
             // Retrieve account from repository
             var account = await _accountRepository.GetAccountAsync(accNo);
+
+            if (account == null)
+            {
+                throw new Exception($"Account {accNo} not found.");
+            }
 
             // Map to balance response DTO
             return new ViewBalanceResponseDto()
@@ -197,6 +203,11 @@ namespace GdbWebApi.Application.Services.Implementations
         {
             // Retrieve account from repository
             var account = await _accountRepository.GetAccountAsync(accNo);
+
+            if (account == null)
+            {
+                throw new Exception($"Account {accNo} not found.");
+            }
 
             // Map to account view response DTO
             return new ViewAccountResponseDto()
