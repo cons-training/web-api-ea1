@@ -54,8 +54,12 @@ builder.Services.AddCors(options =>
     });
 });
 
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+builder.Services.AddProblemDetails();
+
 var app = builder.Build();
-app.UseMiddleware<ExceptionHandlingMiddleware>();
+app.UseExceptionHandler();
+
 app.UseCors("GdbCorsPolicy");
 
 
