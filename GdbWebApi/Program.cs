@@ -3,6 +3,7 @@ using Asp.Versioning.ApiExplorer;
 using GdbWebApi.Application.Extensions;
 using GdbWebApi.Infrastructure.Swagger;
 using System.Text.Json.Serialization;
+using GdbWebApi.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -42,7 +43,25 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.ConfigureOptions<ConfigureSwaggerOptions>();
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("GdbCorsPolicy", policy =>
+    {
+        policy
+            .AllowAnyOrigin()
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+    });
+});
+
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+builder.Services.AddProblemDetails();
+
 var app = builder.Build();
+app.UseExceptionHandler();
+
+app.UseCors("GdbCorsPolicy");
+
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

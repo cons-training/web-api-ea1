@@ -15,6 +15,7 @@ using System.Threading.Tasks;
 using System.Xml.Linq;
 using gdb.Logging;
 using Microsoft.Extensions.Logging;
+using GdbWebApi.Domain.Exceptions;
 
 namespace GdbWebApi.Application.Services.Implementations
 {
@@ -173,7 +174,7 @@ namespace GdbWebApi.Application.Services.Implementations
 
             if (account == null)
             {
-                throw new Exception($"Account {accNo} not found.");
+                throw new AccountNotFoundException($"Account {accNo} not found.");
             }
 
             // Map to balance response DTO
@@ -209,7 +210,7 @@ namespace GdbWebApi.Application.Services.Implementations
 
             if (account == null)
             {
-                throw new Exception($"Account {accNo} not found.");
+                throw new AccountNotFoundException($"Account {accNo} not found.");
             }
 
             // Map to account view response DTO
@@ -263,7 +264,7 @@ namespace GdbWebApi.Application.Services.Implementations
             if (account == null)
             {
                 _logger.LogWarning("Close requested for unknown account {AccountNumber}", request.AccountNumber);
-                throw new Exception("Account not found.");
+                throw new AccountNotFoundException("Account not found.");
             }
 
             // Validate account is not already closed

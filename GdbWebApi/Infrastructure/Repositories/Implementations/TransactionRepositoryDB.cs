@@ -13,89 +13,103 @@ namespace GdbWebApi.Infrastructure.Repositories.Implementations
 {
     public class TransactionRepositoryDB : ITransactionRepository
     {
+        private static readonly ILogger _logger =
+                    AppLogger.CreateLogger<TransactionRepositoryDB>();
         public List<ViewRecentTransactionsResponseDto> GetRecentTransactions(
             string accountNumber)
         {
-            List<ViewRecentTransactionsResponseDto> transactions =
-                new List<ViewRecentTransactionsResponseDto>();
-
-            using (DbConnection connection =
-                   DataBaseConnectionManager.GetConnection())
+            try
             {
-                connection.Open();
+                List<ViewRecentTransactionsResponseDto> transactions =
+                    new List<ViewRecentTransactionsResponseDto>();
 
-                using (DbCommand command =
-                       connection.CreateCommand())
+                using (DbConnection connection =
+                       DataBaseConnectionManager.GetConnection())
                 {
-                    command.CommandText =
-                        TransactionQueries.GetRecentTransactions;
+                    connection.Open();
 
-                    AddParameter(
-                        command,
-                        "@AccountNumber",
-                        accountNumber);
-
-                    using (DbDataReader reader =
-                           command.ExecuteReader())
+                    using (DbCommand command =
+                           connection.CreateCommand())
                     {
-                        while (reader.Read())
+                        command.CommandText =
+                            TransactionQueries.GetRecentTransactions;
+
+                        AddParameter(
+                            command,
+                            "@AccountNumber",
+                            accountNumber);
+
+                        using (DbDataReader reader =
+                               command.ExecuteReader())
                         {
-                            ViewRecentTransactionsResponseDto transaction =
-                                new ViewRecentTransactionsResponseDto();
+                            while (reader.Read())
+                            {
+                                ViewRecentTransactionsResponseDto transaction =
+                                    new ViewRecentTransactionsResponseDto();
 
-                            transaction.TransactionId =
-                                Convert.ToInt32(
-                                    reader["TransactionId"]);
+                                transaction.TransactionId =
+                                    Convert.ToInt32(
+                                        reader["TransactionId"]);
 
-                            transaction.FromAccountNumber =
-                                reader["FromAccountNumber"] == DBNull.Value
-                                    ? null
-                                    : reader["FromAccountNumber"].ToString();
+                                transaction.FromAccountNumber =
+                                    reader["FromAccountNumber"] == DBNull.Value
+                                        ? null
+                                        : reader["FromAccountNumber"].ToString();
 
-                            transaction.ToAccountNumber =
-                                reader["ToAccountNumber"] == DBNull.Value
-                                    ? null
-                                    : reader["ToAccountNumber"].ToString();
+                                transaction.ToAccountNumber =
+                                    reader["ToAccountNumber"] == DBNull.Value
+                                        ? null
+                                        : reader["ToAccountNumber"].ToString();
 
-                            transaction.Amount =
-                                Convert.ToDecimal(
-                                    reader["Amount"]);
+                                transaction.Amount =
+                                    Convert.ToDecimal(
+                                        reader["Amount"]);
 
-                            transaction.TransactionType =
-                                (TransactionType)Enum.Parse(
-                                    typeof(TransactionType),
-                                    reader["TransactionType"].ToString(),
-                                    true);
+                                transaction.TransactionType =
+                                    (TransactionType)Enum.Parse(
+                                        typeof(TransactionType),
+                                        reader["TransactionType"].ToString(),
+                                        true);
 
-                            transaction.TransactionStatus =
-                                (TransactionStatus)Enum.Parse(
-                                    typeof(TransactionStatus),
-                                    reader["TransactionStatus"].ToString(),
-                                    true);
+                                transaction.TransactionStatus =
+                                    (TransactionStatus)Enum.Parse(
+                                        typeof(TransactionStatus),
+                                        reader["TransactionStatus"].ToString(),
+                                        true);
 
-                            transaction.Timestamp =
-                                Convert.ToDateTime(
-                                    reader["Timestamp"]);
+                                transaction.Timestamp =
+                                    Convert.ToDateTime(
+                                        reader["Timestamp"]);
 
-                            transaction.BalanceAfterFrom =
-                                reader["BalanceAfterFrom"] == DBNull.Value
-                                    ? null
-                                    : Convert.ToDecimal(
-                                        reader["BalanceAfterFrom"]);
+                                transaction.BalanceAfterFrom =
+                                    reader["BalanceAfterFrom"] == DBNull.Value
+                                        ? null
+                                        : Convert.ToDecimal(
+                                            reader["BalanceAfterFrom"]);
 
-                            transaction.BalanceAfterTo =
-                                reader["BalanceAfterTo"] == DBNull.Value
-                                    ? null
-                                    : Convert.ToDecimal(
-                                        reader["BalanceAfterTo"]);
+                                transaction.BalanceAfterTo =
+                                    reader["BalanceAfterTo"] == DBNull.Value
+                                        ? null
+                                        : Convert.ToDecimal(
+                                            reader["BalanceAfterTo"]);
 
-                            transactions.Add(transaction);
+                                transactions.Add(transaction);
+                            }
                         }
                     }
                 }
-            }
 
-            return transactions;
+                return transactions;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(
+                    ex,
+                    "Failed to fetch recent transactions for account {AccountNumber}",
+                    accountNumber);
+
+                throw;
+            }
         }
 
 
@@ -108,58 +122,73 @@ namespace GdbWebApi.Infrastructure.Repositories.Implementations
             decimal balanceAfterFrom,
             decimal balanceAfterTo)
         {
-            using (DbConnection connection =
-                   DataBaseConnectionManager.GetConnection())
+            try
             {
-                connection.Open();
-
-                using (DbCommand command =
-                       connection.CreateCommand())
+                using (DbConnection connection =
+                       DataBaseConnectionManager.GetConnection())
                 {
-                    command.CommandText =
-                        TransactionQueries.InsertTransaction;
+                    connection.Open();
 
-                    AddParameter(
-                        command,
-                        "@TransactionType",
-                        transactionType.ToString().ToUpper());
+                    using (DbCommand command =
+                           connection.CreateCommand())
+                    {
+                        command.CommandText =
+                            TransactionQueries.InsertTransaction;
 
-                    AddParameter(
-                        command,
-                        "@FromAccountNumber",
-                        string.IsNullOrEmpty(fromAccountNumber)
-                            ? (object)DBNull.Value
-                            : fromAccountNumber);
+                        AddParameter(
+                            command,
+                            "@TransactionType",
+                            transactionType.ToString().ToUpper());
 
-                    AddParameter(
-                        command,
-                        "@ToAccountNumber",
-                        string.IsNullOrEmpty(toAccountNumber)
-                            ? (object)DBNull.Value
-                            : toAccountNumber);
+                        AddParameter(
+                            command,
+                            "@FromAccountNumber",
+                            string.IsNullOrEmpty(fromAccountNumber)
+                                ? (object)DBNull.Value
+                                : fromAccountNumber);
 
-                    AddParameter(
-                        command,
-                        "@Amount",
-                        amount);
+                        AddParameter(
+                            command,
+                            "@ToAccountNumber",
+                            string.IsNullOrEmpty(toAccountNumber)
+                                ? (object)DBNull.Value
+                                : toAccountNumber);
 
-                    AddParameter(
-                        command,
-                        "@TransactionStatus",
-                        transactionStatus.ToString().ToUpper());
+                        AddParameter(
+                            command,
+                            "@Amount",
+                            amount);
 
-                    AddParameter(
-                        command,
-                        "@BalanceAfterFrom",
-                        balanceAfterFrom);
+                        AddParameter(
+                            command,
+                            "@TransactionStatus",
+                            transactionStatus.ToString().ToUpper());
 
-                    AddParameter(
-                        command,
-                        "@BalanceAfterTo",
-                        balanceAfterTo);
+                        AddParameter(
+                            command,
+                            "@BalanceAfterFrom",
+                            balanceAfterFrom);
 
-                    command.ExecuteNonQuery();
+                        AddParameter(
+                            command,
+                            "@BalanceAfterTo",
+                            balanceAfterTo);
+
+                        command.ExecuteNonQuery();
+                    }
                 }
+
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(
+                    ex,
+                    "Failed to save {TransactionType} transaction from {FromAccount} to {ToAccount}",
+                    transactionType,
+                    fromAccountNumber,
+                    toAccountNumber);
+
+                throw;
             }
         }
 

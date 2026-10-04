@@ -37,31 +37,19 @@ namespace GdbWebApi.Application.Controllers
         public async Task<ActionResult<DepositResponseDto>> DepositAsync(
             [FromBody] DepositRequestDto request)
         {
-            if (request == null)
+            var transactionDto = new TransactionDto
             {
-                return BadRequest(new { message = "Deposit request cannot be null." });
-            }
+                AccountNumber = request.AccountNumber,
+                Amount = request.Amount
+            };
 
-            try
-            {
-                var transactionDto = new TransactionDto
-                {
-                    AccountNumber = request.AccountNumber,
-                    Amount = request.Amount
-                };
+            DepositResponseDto response =
+                await _transactionService
+                    .ProcessTransactionAsync<DepositResponseDto>(
+                        transactionDto,
+                        TransactionType.Deposit);
 
-                DepositResponseDto response =
-                    await _transactionService
-                        .ProcessTransactionAsync<DepositResponseDto>(
-                            transactionDto,
-                            TransactionType.Deposit);
-
-                return Ok(response);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
+            return Ok(response);
         }
 
         // POST: api/v1/Transaction/withdraw
@@ -69,32 +57,20 @@ namespace GdbWebApi.Application.Controllers
         public async Task<ActionResult<WithdrawResponseDto>> WithdrawAsync(
             [FromBody] WithdrawRequestDto request)
         {
-            if (request == null)
+            var transactionDto = new TransactionDto
             {
-                return BadRequest(new { message = "Withdraw request cannot be null." });
-            }
+                AccountNumber = request.AccountNumber,
+                Amount = request.Amount,
+                Pin = request.Pin
+            };
 
-            try
-            {
-                var transactionDto = new TransactionDto
-                {
-                    AccountNumber = request.AccountNumber,
-                    Amount = request.Amount,
-                    Pin = request.Pin
-                };
+            WithdrawResponseDto response =
+                await _transactionService
+                    .ProcessTransactionAsync<WithdrawResponseDto>(
+                        transactionDto,
+                        TransactionType.Withdraw);
 
-                WithdrawResponseDto response =
-                    await _transactionService
-                        .ProcessTransactionAsync<WithdrawResponseDto>(
-                            transactionDto,
-                            TransactionType.Withdraw);
-
-                return Ok(response);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
+            return Ok(response);
         }
 
         // POST: api/v1/Transaction/transfer
@@ -102,33 +78,21 @@ namespace GdbWebApi.Application.Controllers
         public async Task<ActionResult<TranferFundsResponseDto>> TransferFundsAsync(
             [FromBody] TransferRequestDto request)
         {
-            if (request == null)
+            var transactionDto = new TransactionDto
             {
-                return BadRequest(new { message = "Transfer request cannot be null." });
-            }
+                FromAccount = request.FromAccount,
+                ToAccount = request.ToAccount,
+                Amount = request.Amount,
+                Pin = request.Pin
+            };
 
-            try
-            {
-                var transactionDto = new TransactionDto
-                {
-                    FromAccount = request.FromAccount,
-                    ToAccount = request.ToAccount,
-                    Amount = request.Amount,
-                    Pin = request.Pin
-                };
+            TranferFundsResponseDto response =
+                await _transactionService
+                    .ProcessTransactionAsync<TranferFundsResponseDto>(
+                        transactionDto,
+                        TransactionType.Transfer);
 
-                TranferFundsResponseDto response =
-                    await _transactionService
-                        .ProcessTransactionAsync<TranferFundsResponseDto>(
-                            transactionDto,
-                            TransactionType.Transfer);
-
-                return Ok(response);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
+            return Ok(response);
         }
 
         // GET: api/v1/Transaction/{accountNumber}/recent
@@ -136,18 +100,11 @@ namespace GdbWebApi.Application.Controllers
         public async Task<ActionResult<List<ViewRecentTransactionsResponseDto>>>
             GetRecentTransactionsAsync(string accountNumber)
         {
-            try
-            {
-                List<ViewRecentTransactionsResponseDto> response =
-                    await _transactionQueryService
-                        .GetRecentTransactionsAsync(accountNumber);
+            List<ViewRecentTransactionsResponseDto> response =
+                await _transactionQueryService
+                    .GetRecentTransactionsAsync(accountNumber);
 
-                return Ok(response);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
+            return Ok(response);
         }
     }
 }

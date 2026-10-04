@@ -46,7 +46,7 @@ namespace GdbWebApi.Application.Services.Implementations
                     "Transfer failed: from account {AccountNumber} not found",
                     transactionDto.FromAccount);
 
-                throw new AccountException(
+                throw new AccountNotFoundException(
                     "From account not found");
             }
 
@@ -61,7 +61,7 @@ namespace GdbWebApi.Application.Services.Implementations
                     "Transfer failed: to account {AccountNumber} not found",
                     transactionDto.ToAccount);
 
-                throw new AccountException(
+                throw new AccountNotFoundException(
                     "To account not found");
             }
 

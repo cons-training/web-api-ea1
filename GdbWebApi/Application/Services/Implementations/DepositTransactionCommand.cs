@@ -2,7 +2,7 @@
 using GdbWebApi.Application.Dtos;
 using GdbWebApi.Application.Services.Contracts;
 using GdbWebApi.Domain.Enums;
-using GdbWebApi.Domain.Exceptions;
+using GdbWebApi.Domain.Exceptions; 
 using GdbWebApi.Domain.Models;
 using GdbWebApi.Infrastructure.Repositories.Contracts;
 using Microsoft.Extensions.Logging;
@@ -45,7 +45,7 @@ namespace GdbWebApi.Application.Services.Implementations
                     "Deposit failed: account {AccountNumber} not found",
                     transactionDto.AccountNumber);
 
-                throw new AccountException(
+                throw new AccountNotFoundException(
                     "Account not found");
             }
 
