@@ -57,34 +57,20 @@ namespace GdbWebApi.Application.Controllers
         [HttpGet("{accNo}/balance")]
         public async Task<IActionResult> GetBalanceAsync(string accNo)
         {
-            try
-            {
-                ViewBalanceResponseDto response =
-                    await _accountService.GetBalanceAsync(accNo);
+            ViewBalanceResponseDto response =
+                await _accountService.GetBalanceAsync(accNo);
 
-                return Ok(response);
-            }
-            catch (Exception ex)
-            {
-                return NotFound(new { message = ex.Message });
-            }
+            return Ok(response);
         }
 
         // GET: api/v1/Account/{accNo}/details
         [HttpGet("{accNo}/details")]
         public async Task<IActionResult> ViewAccountAsync(string accNo)
         {
-            try
-            {
-                ViewAccountResponseDto response =
-                    await _accountService.ViewAccountAsync(accNo);
+            ViewAccountResponseDto response =
+                await _accountService.ViewAccountAsync(accNo);
 
-                return Ok(response);
-            }
-            catch (Exception ex)
-            {
-                return NotFound(new { message = ex.Message });
-            }
+            return Ok(response);
         }
 
         // POST: api/v1/Account/savings
@@ -92,10 +78,6 @@ namespace GdbWebApi.Application.Controllers
         public IActionResult CreateSavingsAccount(
             [FromBody] CreateSavingsAccountRequestDto request)
         {
-            if (request == null)
-            {
-                return BadRequest(new { message = "Request body cannot be null." });
-            }
 
             var fullRequest = new CreateAccountRequestDto
             {
@@ -119,11 +101,6 @@ namespace GdbWebApi.Application.Controllers
         public IActionResult CreateCurrentAccount(
             [FromBody] CreateCurrentAccountRequestDto request)
         {
-            if (request == null)
-            {
-                return BadRequest(new { message = "Request body cannot be null." });
-            }
-
             var fullRequest = new CreateAccountRequestDto
             {
                 AccountNumber = request.AccountNumber,
@@ -145,11 +122,6 @@ namespace GdbWebApi.Application.Controllers
         public IActionResult CreateFixedDepositAccount(
             [FromBody] CreateFixedDepositAccountRequestDto request)
         {
-            if (request == null)
-            {
-                return BadRequest(new { message = "Request body cannot be null." });
-            }
-
             var fullRequest = new CreateAccountRequestDto
             {
                 AccountNumber = request.AccountNumber,
@@ -172,11 +144,6 @@ namespace GdbWebApi.Application.Controllers
         public IActionResult CreateSalaryAccount(
             [FromBody] CreateSalaryAccountRequestDto request)
         {
-            if (request == null)
-            {
-                return BadRequest(new { message = "Request body cannot be null." });
-            }
-
             var fullRequest = new CreateAccountRequestDto
             {
                 AccountNumber = request.AccountNumber,
@@ -198,26 +165,10 @@ namespace GdbWebApi.Application.Controllers
         public IActionResult CreateAccount(
             [FromBody] CreateAccountRequestDto request)
         {
-            if (request == null)
-            {
-                return BadRequest(new { message = "Request body cannot be null." });
-            }
+            CreateAccountResponseDto response =
+                _accountService.CreateAccount(request);
 
-            try
-            {
-                CreateAccountResponseDto response =
-                    _accountService.CreateAccount(request);
-
-                return Ok(response);
-            }
-            catch (InvalidOperationException ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
+            return Ok(response);
         }
 
         // DELETE: api/v1/Account/{accountNumber}
@@ -239,36 +190,21 @@ namespace GdbWebApi.Application.Controllers
         public async Task<IActionResult> CloseAccountAsync(
             [FromBody] CloseAccountRequestDto request)
         {
-            if (request == null || string.IsNullOrWhiteSpace(request.AccountNumber))
-            {
-                return BadRequest(new { message = "Account number is required." });
-            }
 
             return await CloseAccountInternalAsync(request.AccountNumber);
         }
 
         private async Task<IActionResult> CloseAccountInternalAsync(string accountNumber)
         {
-            try
+            var request = new CloseAccountRequestDto
             {
-                var request = new CloseAccountRequestDto { AccountNumber = accountNumber };
-                CloseAccountResponseDto response =
-                    await _accountService.CloseAccountAsync(request);
+                AccountNumber = accountNumber
+            };
 
-                return Ok(response);
-            }
-            catch (Exception ex) when (ex.Message.Contains("not found", StringComparison.OrdinalIgnoreCase))
-            {
-                return NotFound(new { message = ex.Message });
-            }
-            catch (Exception ex) when (ex.Message.Contains("already closed", StringComparison.OrdinalIgnoreCase))
-            {
-                return BadRequest(new { message = ex.Message });
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
+            CloseAccountResponseDto response =
+                await _accountService.CloseAccountAsync(request);
+
+            return Ok(response);
         }
     }
 }

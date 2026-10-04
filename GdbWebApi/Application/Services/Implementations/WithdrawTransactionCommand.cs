@@ -45,7 +45,7 @@ namespace GdbWebApi.Application.Services.Implementations
                     "Withdraw failed: account {AccountNumber} not found",
                     transactionDto.AccountNumber);
 
-                throw new AccountException(
+                throw new AccountNotFoundException(
                     "Account not found");
             }
 

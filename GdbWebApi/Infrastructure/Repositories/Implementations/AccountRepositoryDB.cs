@@ -6,6 +6,7 @@ using System.Data.Common;
 using gdb.Logging;
 using Microsoft.Extensions.Logging;
 using System.Data;
+using GdbWebApi.Domain.Exceptions;
 //using System.Data.SqlClient;
 
 namespace GdbWebApi.Infrastructure.Repositories.Implementations
@@ -421,7 +422,7 @@ namespace GdbWebApi.Infrastructure.Repositories.Implementations
                         if (rowsAffected == 0)
                         {
                             _logger.LogWarning("CloseAccount: account {AccountNumber} not found", accountNumber);
-                            throw new Exception(
+                            throw new AccountNotFoundException(
                                 "Account not found.");
                         }
                     }

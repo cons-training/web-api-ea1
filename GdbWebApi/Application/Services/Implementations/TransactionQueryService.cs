@@ -7,6 +7,8 @@ using GdbWebApi.Infrastructure.Repositories.Implementations;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using gdb.Logging;
+using Microsoft.Extensions.Logging;
 
 namespace GdbWebApi.Application.Services.Implementations
 {
@@ -14,6 +16,8 @@ namespace GdbWebApi.Application.Services.Implementations
     {
         private readonly IAccountRepository _accountRepository;
         private readonly ITransactionRepository _transactionRepository;
+        private static readonly ILogger _logger =
+                        AppLogger.CreateLogger<TransactionQueryService>();
 
         public TransactionQueryService(
             IAccountRepository accountRepository,
@@ -36,7 +40,9 @@ namespace GdbWebApi.Application.Services.Implementations
 
             if (account == null)
             {
-                throw new AccountException("Account not found.");
+                _logger.LogWarning(
+                "Transaction history requested for unknown account {AccountNumber}", accountNumber);
+                throw new AccountNotFoundException("Account not found.");
             }
 
             return _transactionRepository.GetRecentTransactions(accountNumber);
